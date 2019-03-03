@@ -6,6 +6,9 @@ CREATE TABLE users (
   lname VARCHAR(255) NOT NULL
 );
 
+INSERT INTO users (fname, lname)
+VALUES  ("Joseph", "Pell"), ("Layla", "Pell"), ("Liz", "Pell"), ("Bubby", "Pell");
+
 CREATE TABLE questions (
   id INTEGER PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
@@ -14,6 +17,22 @@ CREATE TABLE questions (
 
   FOREIGN KEY (id) REFERENCES users(id)
 );
+
+INSERT INTO questions (title, body, author_id)
+SELECT "Joseph Question", "Who?", users.id
+FROM users WHERE users.fname = "Joseph" AND users.lname = "Pell";
+
+INSERT INTO questions (title, body, author_id)
+SELECT "Layla Question", "What?", users.id
+FROM users WHERE users.fname = "Layla" AND users.lname = "Pell";
+
+INSERT INTO questions (title, body, author_id)
+SELECT "Liz Question", "When?", users.id
+FROM users WHERE users.fname = "Liz" AND users.lname = "Pell";
+
+INSERT INTO questions (title, body, author_id)
+SELECT "Bubby Question", "Where?", users.id
+FROM users WHERE users.fname = "Bubby" AND users.lname = "Pell";
 
 CREATE TABLE question_follows (
   id INTEGER PRIMARY KEY
@@ -24,16 +43,31 @@ CREATE TABLE question_follows (
   FOREIGN KEY (question_id) REFERENCES questions(id)
 );
 
+
+INSERT INTO question_follows (user_id, question_id)
+
+VALUES
+
+((SELECT id FROM users WHERE fname = "Layla" AND lname = "Pell"),
+  (SELECT id FROM questions WHERE title = "Joe Question")
+),
+
+((SELECT id FROM users WHERE fname = "Liz" AND lname = "Pell"),
+(SELECT id FROM questions WHERE title = "Bubby Question")
+);
+
+
 CREATE TABLE replies (
   id INTEGER PRIMARY KEY,
   question_id INTEGER NOT NULL,
   author_id INTEGER NOT NULL,
-  parent_reply_id INTEGER
-
+  parent_reply_id INTEGER,
+  body TEXT NOT NULL
   FOREIGN KEY (question_id) REFERENCES questions(id)
   FOREIGN KEY (author_id) REFERENCES questions(id)
   FOREIGN KEY (parent_reply_id) REFERENCES replies(id)
 );
+
 
 CREATE TABLE question_likes (
   id INTEGER PRIMARY KEY,
