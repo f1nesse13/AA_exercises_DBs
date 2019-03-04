@@ -5,7 +5,7 @@ require_relative 'reply'
 require_relative 'question_like'
 
 class QuestionFollow
-
+  attr_accessor :id, :user_id, :question_id
   def self.find_by_id(id)
     data = QuestionsDatabase.instance.execute(<<-SQL, id: id)
     SELECT question_follows.* FROM question_follows WHERE question_follows.id = :id
