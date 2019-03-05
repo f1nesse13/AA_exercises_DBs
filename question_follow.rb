@@ -11,7 +11,15 @@ class QuestionFollow
     SELECT question_follows.* FROM question_follows WHERE question_follows.id = :id
     SQL
     data.empty? ? nil : data.map { |datum| QuestionFollow.new(datum) }
-  end 
+  end
+
+  def self.followers_for_question_id(question_id)
+    data = QuestionsDatabase.instance.execute(<<-SQL, id: question_id)
+    SELECT users.* FROM users JOIN question_follows ON question_follows.user_id = users.id
+    WHERE question_follows.question_id = :id
+    SQL
+    data.empty? ? nil : data.map { |datum| User.new(datum) }
+  end
 
   def initialize(options)
     @id = options['id']
