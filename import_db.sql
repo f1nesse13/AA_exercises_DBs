@@ -83,8 +83,10 @@ VALUES
     (SELECT id FROM users WHERE fname = "Layla" AND lname = "Pell"),
     NULL,
     "Right now!"
-  ),
+  );
+INSERT INTO replies (question_id, author_id, parent_reply_id, body)
 
+VALUES
   (
     (SELECT id FROM questions WHERE title = "Liz Question"),
     (SELECT id FROM users WHERE fname = "Bubby" AND lname = "Pell"),

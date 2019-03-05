@@ -7,6 +7,7 @@ require_relative 'question_follow'
 
 class Reply
   attr_accessor :id, :author_id, :question_id, :parent_reply_id, :body
+  
   def self.find_by_id(id)
     data = QuestionsDatabase.instance.execute(<<-SQL, id: id)
     SELECT replies.* FROM replies WHERE replies.id = :id
@@ -36,4 +37,24 @@ class Reply
     @body = options['body']
   end
 
+
+  def author
+    Question.find_by_author_id(author_id)  
+  end
+
+  def question
+    Question.find_by_id(id)
+  end
+
+  def parent_reply
+    Reply.find_by_id(parent_reply_id)
+  end
+
+  def child_replies
+    data = QuestionsDatabase.instance.execute(<<-SQL, id: id)
+    SELECT * FROM replies WHERE parent_reply_id = :id
+    SQL
+    data.map { |datum| Reply.new(datum)}
+  end
+    
 end
