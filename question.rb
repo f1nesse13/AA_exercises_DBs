@@ -10,7 +10,14 @@ class Question
     data = QuestionsDatabase.instance.execute(<<-SQL, id: id)
     SELECT questions.* FROM questions WHERE questions.id = :id
     SQL
-    data.nil? ? nil : data.map { |datum| Question.new(datum) }
+    data.empty? ? nil : Question.new(data.first)
+  end
+
+  def self.find_by_author_id(author_id)
+      data = QuestionsDatabase.instance.execute(<<-SQL, id: author_id)
+      SELECT questions.* FROM questions WHERE questions.author_id = :id
+      SQL
+      data.map { |datum| Question.new(datum) }
   end
 
   def initialize(options)
@@ -20,5 +27,14 @@ class Question
     @author_id = options['author_id']
   end
 
+  def author
+    data = QuestionsDatabase.instance.execute(<<-SQL, id: author_id)
+        SELECT fname, lname FROM users WHERE id = :id
+      SQL
+  end
+
+  def replies
+    Reply.find_by_question_id(id)
+  end
 
 end

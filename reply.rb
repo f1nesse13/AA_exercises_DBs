@@ -11,8 +11,22 @@ class Reply
     data = QuestionsDatabase.instance.execute(<<-SQL, id: id)
     SELECT replies.* FROM replies WHERE replies.id = :id
     SQL
-    data.nil? ? nil : data.map { |datum| Reply.new(datum) }
-  end 
+    data.empty? ? nil : data.map { |datum| Reply.new(datum) }
+  end
+  
+  def self.find_by_user_id(author_id)
+    data = QuestionsDatabase.instance.execute(<<-SQL, id: author_id)
+    SELECT replies.* FROM replies WHERE replies.author_id = :id
+    SQL
+    data.empty? ? nil : data.map { |datum| Reply.new(datum) }
+  end
+
+  def self.find_by_question_id(question_id)
+    data = QuestionsDatabase.instance.execute(<<-SQL, id: question_id)
+    SELECT replies.* FROM replies WHERE replies.question_id = :id
+    SQL
+    data.empty? ? nil : data.map { |datum| Reply.new(datum) }
+  end
 
   def initialize(options)
     @id = options['id']

@@ -10,7 +10,7 @@ class QuestionFollow
     data = QuestionsDatabase.instance.execute(<<-SQL, id: id)
     SELECT question_follows.* FROM question_follows WHERE question_follows.id = :id
     SQL
-    data.nil? ? nil : data.map { |datum| QuestionFollow.new(datum) }
+    data.empty? ? nil : data.map { |datum| QuestionFollow.new(datum) }
   end 
 
   def initialize(options)

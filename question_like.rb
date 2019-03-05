@@ -11,7 +11,7 @@ class QuestionLike
     data = QuestionsDatabase.instance.execute(<<-SQL, id: id)
     SELECT question_likes.* FROM question_likes WHERE question_likes.id = :id
     SQL
-    data.nil? ? nil : data.map { |datum| QuestionLike.new(datum) }
+    data.empty? ? nil : data.map { |datum| QuestionLike.new(datum) }
   end 
 
   def initialize(options)
