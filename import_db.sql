@@ -109,11 +109,12 @@ CREATE TABLE question_likes (
 
 INSERT INTO question_likes (user_id, question_id)
   VALUES
-  (
-    (SELECT id FROM users WHERE fname = "Layla" AND lname = "Pell"),
-    (SELECT id FROM questions WHERE title = "Liz Question")
-  ),
-  (
-    (SELECT id FROM users WHERE fname = "Joseph" AND lname = "Pell"),
-    (SELECT id FROM questions WHERE title = "Bubby Question")
-  );
+  (1,2), (2,1), (3,1), (4, 1), (3, 2), (2, 3), (2, 4)
+  -- (
+  --   (SELECT id FROM users WHERE fname = "Layla" AND lname = "Pell"),
+  --   (SELECT id FROM questions WHERE title = "Liz Question")
+  -- ),
+  -- (
+  --   (SELECT id FROM users WHERE fname = "Joseph" AND lname = "Pell"),
+  --   (SELECT id FROM questions WHERE title = "Bubby Question")
+  -- );
