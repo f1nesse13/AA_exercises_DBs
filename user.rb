@@ -1,11 +1,12 @@
-require_relative 'questions_database'
-require_relative 'question'
-require_relative 'question_follow'
-require_relative 'reply'
-require_relative 'question_like'
-class User
-  attr_accessor :id, :fname, :lname
+require_relative "questions_database"
+require_relative "question"
+require_relative "question_follow"
+require_relative "reply"
+require_relative "question_like"
 
+class User
+  attr_accessor :fname, :lname
+  attr_reader :id
   def self.find_by_id(id)
     data = QuestionsDatabase.instance.execute(<<-SQL, id)
     SELECT users.* FROM users WHERE users.id = ?
@@ -20,25 +21,26 @@ class User
     data.empty? ? nil : User.new(data.first)
   end
 
-  def initialize(options={})
-    @id, @fname, @lname = options['id'], options['fname'], options['lname']
+  def initialize(options = {})
+    @id, @fname, @lname = options["id"], options["fname"], options["lname"]
   end
 
-  def create
-    raise "#{self} already in database" if @id
-    QuestionsDatabase.instance.execute(<<-SQL, @fname, @lname)
-      INSERT INTO users (fname, lname)
-      VALUES (?, ?)
-    SQL
-    @id = QuestionsDatabase.instance.last_insert_row_id
-  end
-
-  def update
-    raise "#{self} not in database" unless @id
-    QuestionsDatabase.instance.execute(<<-SQL, @fname, @lname, @id)
-    UPDATE users
-    SET fname = ?, lname = ? WHERE id = ? 
-    SQL
+  def save
+    if @id.nil?
+      QuestionsDatabase.instance.execute(<<-SQL, fname: @fname, lname: @lname)
+        INSERT INTO users (fname, lname)
+        VALUES (:fname, :lname)
+      SQL
+      @id = QuestionsDatabase.instance.last_insert_row_id
+    else
+      QuestionsDatabase.instance.execute(<<-SQL, fname: @fname, lname: @lname, id: @id)
+      UPDATE users
+      SET
+      fname = :fname,
+      lname = :lname
+      WHERE id = :id
+      SQL
+    end
   end
 
   def authored_questions
@@ -53,5 +55,14 @@ class User
     QuestionFollow.followed_questions_for_user_id(self.id)
   end
 
+  def liked_questions
+    QuestionLike.liked_questions_for_user_id(self.id)
+  end
 
+  def average_karma
+    data = QuestionsDatabase.instance.execute(<<-SQL, self.id)
+      SELECT CAST(COUNT(question_likes.id) AS FLOAT) / COUNT(DISTINCT questions.id) AS karma FROM questions LEFT OUTER JOIN question_likes ON questions.id = question_likes.question_id WHERE questions.author_id = ?
+    SQL
+    data.first["karma"]
+  end
 end

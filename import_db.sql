@@ -22,7 +22,7 @@ CREATE TABLE questions (
   body TEXT NOT NULL,
   author_id INTEGER NOT NULL,
 
-  FOREIGN KEY (id) REFERENCES users(id)
+  FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
 INSERT INTO questions (title, body, author_id)
@@ -41,6 +41,10 @@ FROM users WHERE users.fname = "Liz" AND users.lname = "Pell"));
 INSERT INTO questions (title, body, author_id)
 VALUES ("Bubby Question", "Where?", (SELECT id
 FROM users WHERE users.fname = "Bubby" AND users.lname = "Pell"));
+
+INSERT INTO questions (title, body, author_id)
+VALUES ("Joseph 2nd Question", "Whats wrong with you?!", (SELECT id
+FROM users WHERE users.fname = "Joseph" AND users.lname = "Pell"));
 
 CREATE TABLE question_follows (
   id INTEGER PRIMARY KEY,

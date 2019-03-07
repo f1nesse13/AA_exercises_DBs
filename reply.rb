@@ -1,20 +1,20 @@
-require_relative 'questions_database'
-require_relative 'user'
-require_relative 'question'
-require_relative 'question_like'
-require_relative 'question_follow'
-
+require_relative "questions_database"
+require_relative "user"
+require_relative "question"
+require_relative "question_like"
+require_relative "question_follow"
 
 class Reply
-  attr_accessor :id, :author_id, :question_id, :parent_reply_id, :body
-  
+  attr_accessor :author_id, :question_id, :parent_reply_id, :body
+  attr_reader :id
+
   def self.find_by_id(id)
     data = QuestionsDatabase.instance.execute(<<-SQL, id: id)
     SELECT replies.* FROM replies WHERE replies.id = :id
     SQL
     data.empty? ? nil : data.map { |datum| Reply.new(datum) }
   end
-  
+
   def self.find_by_user_id(author_id)
     data = QuestionsDatabase.instance.execute(<<-SQL, id: author_id)
     SELECT replies.* FROM replies WHERE replies.author_id = :id
@@ -30,16 +30,36 @@ class Reply
   end
 
   def initialize(options)
-    @id = options['id']
-    @author_id = options['author_id']
-    @question_id = options['question_id']
-    @parent_reply_id = options['parent_reply_id']
-    @body = options['body']
+    @id = options["id"]
+    @author_id = options["author_id"]
+    @question_id = options["question_id"]
+    @parent_reply_id = options["parent_reply_id"]
+    @body = options["body"]
   end
 
+  def save
+    if @id.nil?
+      QuestionsDatabase.instance.execute(<<-SQL, author: @author_id, question: @question_id, parent: @parent_reply_id, body: @body)
+        INSERT INTO replies (author_id, question_id, parent_reply_id, body)
+        VALUES (:author, :question, :parent, :body)
+      SQL
+      @id = QuestionsDatabase.instance.last_insert_row_id
+    else
+      QuestionsDatabase.instance.execute(<<-SQL, id: @id, author: @author_id, question: @question_id, parent: @parent_reply_id, body: @body)
+      UPDATE replies
+      SET
+      author_id = :author,
+      question_id = :question,
+      parent_reply_id = :parent,
+      body = :body
+      WHERE
+      id = :id
+      SQL
+    end
+  end
 
   def author
-    Question.find_by_author_id(author_id)  
+    Question.find_by_author_id(author_id)
   end
 
   def question
@@ -54,7 +74,6 @@ class Reply
     data = QuestionsDatabase.instance.execute(<<-SQL, id: id)
     SELECT * FROM replies WHERE parent_reply_id = :id
     SQL
-    data.map { |datum| Reply.new(datum)}
+    data.map { |datum| Reply.new(datum) }
   end
-    
 end
