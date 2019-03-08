@@ -3,8 +3,9 @@ require_relative "user"
 require_relative "question_follow"
 require_relative "reply"
 require_relative "question_like"
+require_relative "model_base"
 
-class Question
+class Question < ModelBase
   attr_accessor :title, :body, :author_id
   attr_reader :id
 
@@ -31,6 +32,10 @@ class Question
     @title = options["title"]
     @body = options["body"]
     @author_id = options["author_id"]
+  end
+
+  def attrs
+    { id: id, title: title, body: body, author_id: author_id }
   end
 
   def save

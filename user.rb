@@ -3,10 +3,12 @@ require_relative "question"
 require_relative "question_follow"
 require_relative "reply"
 require_relative "question_like"
+require_relative "model_base"
 
-class User
+class User < ModelBase
   attr_accessor :fname, :lname
   attr_reader :id
+
   def self.find_by_id(id)
     data = QuestionsDatabase.instance.execute(<<-SQL, id)
     SELECT users.* FROM users WHERE users.id = ?
@@ -23,6 +25,10 @@ class User
 
   def initialize(options = {})
     @id, @fname, @lname = options["id"], options["fname"], options["lname"]
+  end
+
+  def attrs
+    { id: id, fname: fname, lname: lname }
   end
 
   def save

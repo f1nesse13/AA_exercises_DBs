@@ -3,8 +3,9 @@ require_relative "user"
 require_relative "question"
 require_relative "reply"
 require_relative "question_follow"
+require_relative "model_base"
 
-class QuestionLike
+class QuestionLike < ModelBase
   attr_reader :id, :user_id, :question_id
 
   def self.find_by_id(id)
